@@ -1,0 +1,2 @@
+include eccv_caption/data/*.json
+include eccv_caption/data/*.npy
