@@ -159,9 +159,9 @@ We measure precision and recall of the existing benchmarks. Precision (Prec) and
 
 | Dataset                  | I2T Prec | I2T Recall | T2I Prec | T2I Recall |
 |--------------------------|----------|------------|----------|------------|
-| Original MS-COCO Caption | 47.3     | 20.0       | 89.4     | 12.8       |
-| [CxC](https://github.com/google-research-datasets/Crisscrossed-Captions) | 39.6     | 22.0       | 81.4     | 15.0       |
-| [Plausible Match](https://github.com/naver-ai/pcme) | 8.3      | 74.6       | 10.5     | 69.0       |
+| Original MS-COCO Caption | 96.9     | 21.1       | 96.4     | 13.8       |
+| [CxC](https://github.com/google-research-datasets/Crisscrossed-Captions) | 95.5     | 23.0       | 93.2     | 16.1       |
+| [Plausible Match](https://github.com/naver-ai/pcme) | 65.3      | 56.5       | 56.6     | 61.8       |
 
 We combine our MTurk results and CxC results to build the final ECCV Caption dataset (by treating CxC results as the sixth machine annotator).
 
