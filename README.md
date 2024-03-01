@@ -201,3 +201,20 @@ THE SOFTWARE.
     booktitle={European Conference on Computer Vision (ECCV)},
 }
 ```
+
+I would like to suggest citing [PCME](https://github.com/naver-ai/pcme) and [PCME++](https://github.com/naver-ai/pcmepp), too.
+```
+@inproceedings{chun2021pcme,
+    title={Probabilistic Embeddings for Cross-Modal Retrieval},
+    author={Chun, Sanghyuk and Oh, Seong Joon and De Rezende, Rafael Sampaio and Kalantidis, Yannis and Larlus, Diane},
+    year={2021},
+    booktitle={Conference on Computer Vision and Pattern Recognition (CVPR)},
+}
+
+@inproceedings{chun2024pcmepp,
+    title={Improved Probabilistic Image-Text Representations},
+    author={Chun, Sanghyuk},
+    year={2024},
+    booktitle={International Conference on Learning Representations (ICLR)},
+}
+```
