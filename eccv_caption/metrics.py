@@ -165,8 +165,15 @@ class Metrics():
             nfold_cids = set([int(_id) for _id in nfold_cids])
             nfold_iids = set([int(_id) for _id in nfold_iids])
 
-            i2t_gt_1k_recalls.append(compute_coco1k_r_at_k(retrieved_items['i2t'], nfold_coco_i2t, nfold_cids, K, self.verbose))
-            t2i_gt_1k_recalls.append(compute_coco1k_r_at_k(retrieved_items['t2i'], nfold_coco_t2i, nfold_iids, K, self.verbose))
+            try:
+                i2t_gt_1k_recalls.append(compute_coco1k_r_at_k(retrieved_items['i2t'], nfold_coco_i2t, nfold_cids, K, self.verbose))
+                t2i_gt_1k_recalls.append(compute_coco1k_r_at_k(retrieved_items['t2i'], nfold_coco_t2i, nfold_iids, K, self.verbose))
+            except ValueError as e:
+                warnings.warn(f'{e} Return -1.')
+                score = {'i2t': -1, 't2i': -1}
+                if modality != 'all':
+                    score = score[modality]
+                return score
         i2t_gt_1k_recall = np.mean(i2t_gt_1k_recalls)
         t2i_gt_1k_recall = np.mean(t2i_gt_1k_recalls)
 
@@ -200,9 +207,16 @@ class Metrics():
         if not self.pm_gts:
             warnings.warn('PM GTs are not found. Please follow https://github.com/naver-ai/eccv-caption to download PM GTs.')
             return
-        return self.__compute_metric(retrieved_items, self.pm_gts,
-                                     compute_rprecision,
-                                     modality)
+        try:
+            return self.__compute_metric(retrieved_items, self.pm_gts,
+                                         compute_rprecision,
+                                         modality)
+        except ValueError:
+            warnings.warn('Insufficient retrieved items (got an empty list). Return -1')
+            score = {'i2t': -1, 't2i': -1}
+            if modality != 'all':
+                score = score[modality]
+            return score
 
     def eccv_recalls(self, retrieved_items: Dict[str, Dict[int, List[int]]],
                      modality: str,
@@ -217,9 +231,16 @@ class Metrics():
                      modality: str) -> Dict[str, Dict[str, float]]:
         """ Compute ECCV Caption metrics including R1, mAP@R, R-Precision """
         self.__check_arguments(retrieved_items, modality)
-        _metrics = self.__compute_metric(retrieved_items, self.eccv_gts,
-                                         compute_eccv_metrics,
-                                         modality)
+        try:
+            _metrics = self.__compute_metric(retrieved_items, self.eccv_gts,
+                                             compute_eccv_metrics,
+                                             modality)
+        except ValueError as e:
+            warnings.warn(f'{e} Return -1')
+            score = {'i2t': -1, 't2i': -1}
+            if modality != 'all':
+                score = score[modality]
+            return score
         metrics = {}
         for modality, _modality_metric in _metrics.items():
             for metric_key, metric_val in _modality_metric.items():
@@ -280,7 +301,7 @@ class Metrics():
         elif i2t_retrieved_items or t2i_retrieved_items:
             raise ValueError('Both `i2t_retrieved_items` and `t2i_retrieved_items` should be None or Dict, but found I2T({type(i2t_retrieved_items)}) T2I({type(t2i_retrieved_items)})')
         else:
-            if not hasattr(self, 'i2t_retrived_items') or not hasattr(self, 'i2t_retrived_items'):
+            if not hasattr(self, 'i2t_retrived_items') or not hasattr(self, 't2i_retrived_items'):
                 raise TypeError('`i2t_retrived_items` and `t2i_retrived_items` are not given. Please set retrieved items before call `compute_all_metrics`, or pass retrived_items as arguments.')
 
         if verbose is not None:
@@ -303,9 +324,9 @@ class Metrics():
         if 'pmrp' in target_metrics:
             _scores = self.pmrp(retrieved_items, 'all')
             if _scores:
-                metrics.update(_scores)
+                metrics.update({'pmrp': _scores})
 
-        if 'eccv_map_at_r' in target_metrics or 'eccv_rpresion' in target_metrics:
+        if 'eccv_map_at_r' in target_metrics or 'eccv_rprecision' in target_metrics:
             _scores = self.eccv_metrics(retrieved_items, 'all')
             _scores = {k: v for k, v in _scores.items() if k in target_metrics}
             metrics.update(_scores)
