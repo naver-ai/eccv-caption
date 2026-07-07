@@ -4,10 +4,10 @@ Copyright (c) 2022-present NAVER Corp.
 MIT license
 """
 import numpy as np
+import warnings
 try:
     from tqdm import tqdm
 except ImportError:
-    import warnings
     warnings.warn('failed to import `tqdm`. verbose option has been disabled.')
 
     def tqdm(x, total=None, disable=None):
@@ -35,6 +35,10 @@ def rprecision(target_items: List[int],
         r = len(gt_items)
 
     target_R_items = set(target_items[:r])
+    if len(target_R_items) == 0:
+        raise ValueError(
+            'R-Precision needs at least one retrieved item, but got an empty list.'
+        )
     non_precise = target_R_items - gt_items
     precision = 1 - len(non_precise) / len(target_R_items)
     return precision
@@ -148,6 +152,12 @@ def compute_coco1k_r_at_k(target_items: Dict[int, List[int]],
         _gt_items = set(gt_items[int(_id)])
         _target_items = [_itemid for _itemid in target_items[_id] if _itemid in nfold_itemids]
         if K == 1:
+            if len(_target_items) == 0:
+                raise ValueError(
+                    'COCO 1K Recall@1 found no retrieved items after fold filtering '
+                    f'for query id {_id}. Please pass full 5K rankings instead of '
+                    'truncated top-K rankings.'
+                )
             _recall = 1 if _target_items[0] in _gt_items else 0
         else:
             _recall = 1 if set(_target_items[:K]) & _gt_items else 0
